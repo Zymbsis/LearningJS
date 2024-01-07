@@ -68,7 +68,7 @@ const arrayForRandomIndex = [];
 let randomIndex;
 function generateRandomIndex() {
   do {
-    randomIndex = Math.round(filteredArray.length * Math.random());
+    randomIndex = Math.round((filteredArray.length - 1) * Math.random());
   } while (arrayForRandomIndex.some(item => item === randomIndex));
   return randomIndex;
 }
