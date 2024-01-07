@@ -1,6 +1,52 @@
 import { filteredData } from './arrayOfMovieData.js';
-
 const moviesArray = filteredData;
+const filteredArray = [];
+for (let i = 0; i < moviesArray.length - 1; i++) {
+  if (
+    moviesArray[i].contributionQuestions.edges[0].node.entity.primaryImage
+      .url !==
+    moviesArray[i + 1].contributionQuestions.edges[0].node.entity.primaryImage
+      .url
+  ) {
+    filteredArray.push(moviesArray[i]);
+    // console.log(
+    //   moviesArray[i].contributionQuestions.edges[0].node.entity.primaryImage
+    //     .url,
+    // );
+  }
+}
+
+// console.log(filteredArray);
+
+// const arr = [];
+// for (const item of moviesArray) {
+// console.log(item.contributionQuestions.edges[0].node.entity.primaryImage.url);
+
+//   arr.push(
+//     `<img width="200" height="200" src=${item.contributionQuestions.edges[0].node.entity.primaryImage.url}>`,
+//   );
+// }
+// document.body.insertAdjacentHTML('afterbegin', arr.join('\n\n'));
+// console.log(arr.join('\n\n'));
+
+const header = makeTag('header', ['header', 'header-container']);
+const main = makeTag('main', 'main-container');
+const logoLink = makeTag(
+  'a',
+  ['logo-link', 'test'],
+  { href: 'index.html', name: 'sitelogo', alt: 'random' },
+  '__ RandoMovie.JS',
+);
+const container = makeTag('div', 'container');
+const generateButton = makeTag(
+  'button',
+  'regenerate',
+  { type: 'button' },
+  'Get another three awesome movies!',
+);
+const footer = makeTag('footer', ['footer', 'footer-container'], {
+  id: 'footer',
+});
 
 function makeTag(tagName, classes, attObj, userText) {
   const html = document.createElement(tagName);
@@ -15,118 +61,44 @@ function makeTag(tagName, classes, attObj, userText) {
     html.setAttribute(`${attribute}`, `${attObj[attribute]}`);
   }
   html.textContent = userText;
-  // console.log(html);
   return html;
 }
 
-///// makeButton створює html елемент button із бажаними типом, класом та текстом;
-///// приймає параметри type (рядок), classes (рядок або масив рядків) та userText (рядок);
-
-function makeButton(type, classes, userText) {
-  const button = document.createElement('button');
-  if (classes) {
-    if (Array.isArray(classes)) {
-      classes.forEach(x => button.classList.add(x));
-    } else {
-      button.classList.add(classes);
-    }
-  }
-  button.type = type;
-  button.textContent = userText;
-  return button;
+const arrayForRandomIndex = [];
+let randomIndex;
+function generateRandomIndex() {
+  do {
+    randomIndex = Math.round(filteredArray.length * Math.random());
+  } while (arrayForRandomIndex.some(item => item === randomIndex));
+  return randomIndex;
 }
 
-///// randomMoviePicker створює html елемент що містить n кількість фільмів, узятих з бази з топ-240 фільмів;
-///// Фільми зберігаються у масиві обʼєктів, кожен з яких містить дані про фільм, у тому числі і постер;
-
-// function check(a) {
-//   const value =
-//     moviesArray[randomIndex].contributionQuestions.edges[0].node.entity.primaryImage
-//       .url;
-//   if (
-//     moviesArray[randomIndex].contributionQuestions.edges[0].node.entity.primaryImage
-//       .url
-//   ) {
-//     return value;
-//   } else {
-//     randomIndex = Math.round(moviesArray.length * Math.random());
-//   }
-// }
-
-function randomMoviePicker(n) {
-  const movieContainer = makeTag('div', 'container');
-  for (let i = 0; i < n; i++) {
-    const randomIndex = Math.round(moviesArray.length * Math.random());
+function randomMoviePicker() {
+  for (let i = 0; i < 3; i++) {
+    generateRandomIndex();
+    arrayForRandomIndex.push(randomIndex);
+    console.log(arrayForRandomIndex.toSorted((a, b) => a - b));
     const imageSrc =
-      moviesArray[randomIndex].contributionQuestions.edges[0].node.entity
+      filteredArray[randomIndex].contributionQuestions.edges[0].node.entity
         .primaryImage.url;
-    const imageAlt = moviesArray[randomIndex].originalTitleText.text;
-    const movieCard = makeTag('div', 'movie-container');
-    const poster = makeTag('img', 'movie-image', {
-      width: 300,
-      height: 450,
-      src: imageSrc,
-      alt: imageAlt,
-    });
-    const link = makeTag('a', 'poster-link', {
-      href: `https://www.google.com/search?q=${moviesArray[
-        randomIndex
-      ].originalTitleText.text.replace(/[\s]/g, '+')}+watch+online`,
-      target: 'blank',
-    });
-    link.appendChild(poster);
-    movieCard.appendChild(link);
-    movieContainer.appendChild(movieCard);
-  }
-  return movieContainer;
-}
-
-///// assembleBaseHtml - збирає структуру сторінки. Приймає обʼєкт, який містить пари key: value, де:
-///// key - батьківський елемент, створений викликом функції makeTag() або document.querySelector();
-///// value - масив дочірніх елементів, створених за допомогою makeTag();
-///// наприклад { body: [header, main, footer], header: [logoLink], main: [container] };
-
-function assembleBaseHtml(obj) {
-  for (const item in obj) {
-    const parent = document.querySelector(item);
-    for (const child of obj[item]) {
-      parent.insertAdjacentElement('afterbegin', child);
-    }
+    const imageAlt = filteredArray[randomIndex].originalTitleText.text;
+    const movieContainer = `<div class="movie-container"><a class="poster-link" href="https://www.google.com/search?q=${filteredArray[
+      randomIndex
+    ].originalTitleText.text.replace(
+      /[\s]/g,
+      '+',
+    )}+watch+online" target="blank"><img class="movie-image" src=${imageSrc} alt=${imageAlt} width="300" height="450"></a></div>`;
+    container.insertAdjacentHTML('beforeend', movieContainer);
   }
 }
 
-function getListener(element, eventType, callbackFn) {
-  element.addEventListener(eventType, e => callbackFn());
-}
+document.body.prepend(header, main, footer);
+header.prepend(logoLink);
+main.prepend(container, generateButton);
+randomMoviePicker();
 
-////////// Після цього вже руцями викликаємо створюємо бажані елементи та викликаємо відповідні функції //////////
+generateButton.addEventListener('click', randomMoviePicker);
 
-const header = makeTag('header', ['header', 'header-container']);
-const main = makeTag('main', 'main-container');
-const footer = makeTag('footer', ['footer', 'footer-container']);
-const logoLink = makeTag(
-  'a',
-  ['logo-link', 'test'],
-  { href: 'index.html', name: 'sitelogo', alt: 'random' },
-  '__ RandoMovie.JS',
+generateButton.addEventListener('click', () =>
+  generateButton.scrollIntoView({ behavior: 'smooth' }),
 );
-
-const generateButton = makeButton(
-  'button',
-  'regenerate',
-  'Get another three awesome movies!',
-);
-
-assembleBaseHtml({
-  body: [footer, main, header],
-  header: [logoLink],
-  main: [generateButton, randomMoviePicker(3)],
-});
-
-document
-  .querySelector('.regenerate')
-  .addEventListener('click', () =>
-    document
-      .querySelector('.container')
-      .insertAdjacentHTML('beforeend', randomMoviePicker(3).innerHTML),
-  );
