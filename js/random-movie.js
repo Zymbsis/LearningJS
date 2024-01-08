@@ -37,7 +37,7 @@ const logoLink = makeTag(
   { href: 'index.html', name: 'sitelogo', alt: 'random' },
   '__ RandoMovie.JS',
 );
-const container = makeTag('div', 'container');
+const container = makeTag('ul', 'container');
 const generateButton = makeTag(
   'button',
   'regenerate',
@@ -82,12 +82,12 @@ function randomMoviePicker() {
       filteredArray[randomIndex].contributionQuestions.edges[0].node.entity
         .primaryImage.url;
     const imageAlt = filteredArray[randomIndex].originalTitleText.text;
-    const movieContainer = `<div class="movie-container"><a class="poster-link" href="https://www.google.com/search?q=${filteredArray[
+    const movieContainer = `<li class="movie-container"><a class="poster-link" href="https://www.google.com/search?q=${filteredArray[
       randomIndex
     ].originalTitleText.text.replace(
       /[\s]/g,
       '+',
-    )}+watch+online" target="blank"><img class="movie-image" src=${imageSrc} alt=${imageAlt} width="300" height="450"></a></div>`;
+    )}+watch+online" target="blank"><img class="movie-image" src=${imageSrc} alt=${imageAlt} width="300" height="450"></a></li>`;
     container.insertAdjacentHTML('beforeend', movieContainer);
   }
 }
@@ -102,3 +102,9 @@ generateButton.addEventListener('click', randomMoviePicker);
 generateButton.addEventListener('click', () =>
   generateButton.scrollIntoView({ behavior: 'smooth' }),
 );
+
+generateButton.addEventListener('click', () => {
+  for (const item of document.querySelectorAll('.movie-container')) {
+    item.style.opacity = '1';
+  }
+});
